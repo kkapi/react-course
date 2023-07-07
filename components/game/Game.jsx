@@ -1,20 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { SYMBOL_O, SYMBOL_X } from '../../utils/consts';
 import classes from '../../styles/game.module.css';
 
 export function Game() {
-	const cells = [
-		SYMBOL_X,
-		null,
-		null,
-		SYMBOL_O,
-		SYMBOL_X,
-		null,
-		SYMBOL_O,
-		null,
-		null,
-	];
-	const currentStep = SYMBOL_X;
+	const [cells, setCells] = useState(Array(9).fill(null));
+
+	const [currentStep, setCurrentStep] = useState(SYMBOL_X);
 
 	const getSymbolClassName = symbol => {
 		if (symbol === SYMBOL_O) return 'symbol--o';
@@ -23,18 +14,36 @@ export function Game() {
 	};
 
 	const renderSymbol = symbol => (
-		<span className={`${classes['symbol']} ${classes[getSymbolClassName(symbol)]}`}>
+		<span
+			className={`${classes['symbol']} ${
+				classes[getSymbolClassName(symbol)]
+			}`}
+		>
 			{symbol}
 		</span>
 	);
 
+	const handleCick = index => {
+		if (cells[index]) return;
+		const newCells = cells.slice();
+		newCells[index] = currentStep;
+		setCells(newCells);
+		setCurrentStep(currentStep === SYMBOL_X ? SYMBOL_O : SYMBOL_X);
+	};
+
 	return (
-		<div className={classes["game"]}>
-			<div className={classes["game-info"]}>Ход: {renderSymbol(currentStep)}</div>
-			<div className={classes["game-field"]}>
+		<div className={classes['game']}>
+			<div className={classes['game-info']}>
+				Ход: {renderSymbol(currentStep)}
+			</div>
+			<div className={classes['game-field']}>
 				{cells.map((symbol, index) => {
 					return (
-						<button key={index} className={`${classes['cell']}`}>
+						<button
+							onClick={() => handleCick(index)}
+							key={index}
+							className={`${classes['cell']}`}
+						>
 							{symbol ? renderSymbol(symbol) : null}
 						</button>
 					);
