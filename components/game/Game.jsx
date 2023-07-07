@@ -4,30 +4,15 @@ import classes from '../../styles/game.module.css';
 import { computeWinner } from '../../utils/game';
 
 export function Game() {
-	const [cells, setCells] = useState(Array(9).fill(null));
-	const [currentStep, setCurrentStep] = useState(SYMBOL_X);
-	const [winnerSequence, setWinnerSequence] = useState();
-
-	const winnerSymbol = winnerSequence ? cells[winnerSequence[0]] : undefined;
-	const isDraw = !winnerSequence && cells.filter(value => value).length === 9;
-
-	const handleClick = index => {
-		if (cells[index] || winnerSequence) return;
-		const cellsCopy = cells.slice();
-		cellsCopy[index] = currentStep;
-
-		const winner = computeWinner(cellsCopy);
-
-		setCells(cellsCopy);
-		setCurrentStep(currentStep === SYMBOL_X ? SYMBOL_O : SYMBOL_X);
-		setWinnerSequence(winner);
-	};
-
-	const handleReset = () => {
-		setCells(Array(9).fill(null));
-		setCurrentStep(SYMBOL_X);
-		setWinnerSequence(undefined);
-	};
+	const {
+		cells,
+		currentStep,
+		winnerSequence,
+		handleClick,
+		handleReset,
+		winnerSymbol,
+		isDraw,
+	} = useGameState();
 
 	return (
 		<div className={classes['game']}>
@@ -51,6 +36,46 @@ export function Game() {
 			</button>
 		</div>
 	);
+
+	function useGameState() {
+		const [cells, setCells] = useState(Array(9).fill(null));
+		const [currentStep, setCurrentStep] = useState(SYMBOL_X);
+		const [winnerSequence, setWinnerSequence] = useState();
+
+		const handleClick = index => {
+			if (cells[index] || winnerSequence) return;
+			const cellsCopy = cells.slice();
+			cellsCopy[index] = currentStep;
+
+			const winner = computeWinner(cellsCopy);
+
+			setCells(cellsCopy);
+			setCurrentStep(currentStep === SYMBOL_X ? SYMBOL_O : SYMBOL_X);
+			setWinnerSequence(winner);
+		};
+
+		const handleReset = () => {
+			setCells(Array(9).fill(null));
+			setCurrentStep(SYMBOL_X);
+			setWinnerSequence(undefined);
+		};
+
+		const winnerSymbol = winnerSequence
+			? cells[winnerSequence[0]]
+			: undefined;
+		const isDraw =
+			!winnerSequence && cells.filter(value => value).length === 9;
+
+		return {
+			cells,
+			currentStep,
+			winnerSequence,
+			handleClick,
+			handleReset,
+			winnerSymbol,
+			isDraw,
+		};
+	}
 
 	function GameInfo({ isDraw, winnerSymbol, currentStep }) {
 		if (isDraw) {
